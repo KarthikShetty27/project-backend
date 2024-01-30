@@ -14,8 +14,6 @@ form_data = []
 # Define a route to handle POST requests for submitting form data
 @app.route('/form-data', methods=['POST'])
 def handle_form_data():
-    # Access the global variable form_data
-    # global form_data
     # Get JSON data from the request
     data = request.json
     # Extract specific keys from the data and append to the form_data list
