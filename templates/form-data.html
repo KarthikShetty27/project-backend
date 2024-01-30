@@ -1,4 +1,4 @@
-<!-- form-data.html -->
+<!-- templates/form-data.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,11 +8,12 @@
 </head>
 <body>
     <h1>Form Data</h1>
-    <p>Age: {{ age }}</p>
-    <p>Socioeconomic Background: {{ socioeconomic_background }}</p>
-    <p>SSC Marks: {{ ssc_marks }}</p>
-    <p>HSC Marks: {{ hsc_marks }}</p>
-    <p>MHTCET Marks: {{ mhtcet_marks }}</p>
-    <p>JEE Mains Marks: {{ jee_mains_marks }}</p>
+    <ul>
+        {% for data in form_data %}
+        <li>
+            Age: {{ data.age }}, <br> Socioeconomic Background: {{ data.socioeconomic_background }}, <br> SSC Marks: {{ data.ssc_marks }}, <br> HSC Marks: {{ data.hsc_marks }}, <br> MHTCET Marks: {{ data.mhtcet_marks }}, <br> JEE Mains Marks: {{ data.jee_mains_marks }}
+        </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
