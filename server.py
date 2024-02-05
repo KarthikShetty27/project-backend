@@ -1,3 +1,4 @@
+# server.py
 # Import necessary modules from Flask
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -23,25 +24,21 @@ form_data = []
 
 # Function to preprocess the data
 def preprocess_data(data):
-    if isinstance(data, list):
-        # Convert string values to float where necessary for each entry in the list
-        for entry in data:
-            entry['age'] = float(entry['age'])
-            entry['hscMarks'] = float(entry['hscMarks'])
-            entry['jeeMainsMarks'] = float(entry['jeeMainsMarks'])
-            entry['mhtcetMarks'] = float(entry['mhtcetMarks'])
-            entry['sscMarks'] = float(entry['sscMarks'])
-    else:
-        # Convert string values to float for a single dictionary
-        data['age'] = float(data['age'])
-        data['hscMarks'] = float(data['hscMarks'])
-        data['jeeMainsMarks'] = float(data['jeeMainsMarks'])
-        data['mhtcetMarks'] = float(data['mhtcetMarks'])
-        data['sscMarks'] = float(data['sscMarks'])
+    # Convert string values to float for the dictionary
+    data['age'] = float(data['age'])
+    data['hscMarks'] = float(data['hscMarks'])
+    data['jeeMainsMarks'] = float(data['jeeMainsMarks'])
+    data['mhtcetMarks'] = float(data['mhtcetMarks'])
+    data['sscMarks'] = float(data['sscMarks'])
+
     return data
 
-# Function to make predictions using the models
 def make_predictions(data):
+    print("Processed Data:", data)  # Add this line for debugging
+
+    # Convert scalar values to lists
+    data = {key: [value] for key, value in data.items()}
+
     # Convert list of dictionaries to DataFrame
     form_data_df = pd.DataFrame(data)
 
@@ -93,7 +90,7 @@ def predict():
     data = request.json
     
     # Preprocess the data
-    processed_data = preprocess_data([data])
+    processed_data = preprocess_data(data)
     
     # Make predictions
     college_preds, branch_preds = make_predictions(processed_data)
