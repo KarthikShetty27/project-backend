@@ -77,6 +77,7 @@ def submit_form():
     # Return a JSON response indicating successful form data submission
     return jsonify({"message": "Form data received successfully"})
 
+# For Debugging
 # Define a route to handle GET requests for retrieving form data
 @app.route('/get-form', methods=['GET'])
 def get_form():
