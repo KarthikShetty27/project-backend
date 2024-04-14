@@ -1,8 +1,8 @@
-# server.py
 # Import necessary modules from Flask
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
+import numpy as np
 from catboost import CatBoostClassifier
 from sklearn.preprocessing import LabelEncoder
 
@@ -26,14 +26,14 @@ form_data = []
 def preprocess_data(data):
     # Convert string values to float for the dictionary
     data['age'] = float(data['age'])
-    data['hscMarks'] = float(data['hscMarks'])
-    data['jeeMainsMarks'] = float(data['jeeMainsMarks'])
-    data['mhtcetMarks'] = float(data['mhtcetMarks'])
     data['sscMarks'] = float(data['sscMarks'])
+    data['hscMarks'] = float(data['hscMarks'])
+    data['mhtcetMarks'] = float(data['mhtcetMarks'])
+    data['jeeMainsMarks'] = float(data['jeeMainsMarks'])
 
     return data
 
-def make_predictions(data):
+def make_predictions(data, top_n=3):
     print("Processed Data:", data)  # Add this line for debugging
 
     # Convert scalar values to lists
@@ -60,10 +60,22 @@ def make_predictions(data):
     })
 
     # Make predictions
-    college_preds = college_model.predict(data_point)
-    branch_preds = branch_model.predict(data_point)
-    
-    return college_preds, branch_preds
+# new
+    college_probs = college_model.predict_proba(data_point)
+    branch_probs = branch_model.predict_proba(data_point)
+
+    # Get the indices of the top N predictions
+    top_n_college_indices = college_probs.argsort()[:, ::-1][:, :top_n]
+    top_n_branch_indices = branch_probs.argsort()[:, ::-1][:, :top_n]
+
+    # Get the top N predictions and their corresponding probabilities
+    top_n_college_preds = college_model.classes_[top_n_college_indices]
+    top_n_college_probs = np.array([college_probs[i, indices] for i, indices in enumerate(top_n_college_indices)])
+
+    top_n_branch_preds = branch_model.classes_[top_n_branch_indices]
+    top_n_branch_probs = np.array([branch_probs[i, indices] for i, indices in enumerate(top_n_branch_indices)])
+
+    return top_n_college_preds.tolist(), top_n_branch_preds.tolist()
 
 # Define a route to handle POST requests for submitting form data
 @app.route('/submit-form', methods=['POST'])
@@ -98,8 +110,8 @@ def predict():
     
     # Return the predictions as a JSON response
     return jsonify({
-        "collegePredictions": college_preds.tolist(),
-        "branchPredictions": branch_preds.tolist()
+        "collegePredictions": college_preds,
+        "branchPredictions": branch_preds
     })
 
 # Run the Flask app if the script is executed directly
