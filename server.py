@@ -60,7 +60,6 @@ def make_predictions(data, top_n=3):
     })
 
     # Make predictions
-# new
     college_probs = college_model.predict_proba(data_point)
     branch_probs = branch_model.predict_proba(data_point)
 
@@ -75,7 +74,16 @@ def make_predictions(data, top_n=3):
     top_n_branch_preds = branch_model.classes_[top_n_branch_indices]
     top_n_branch_probs = np.array([branch_probs[i, indices] for i, indices in enumerate(top_n_branch_indices)])
 
-    return top_n_college_preds.tolist(), top_n_branch_preds.tolist()
+    # new
+    # Convert predictions and probabilities to 2D arrays
+    college_predictions = [[pred, prob] for pred, prob in zip(top_n_college_preds[0], top_n_college_probs[0])]
+    branch_predictions = [[pred, prob] for pred, prob in zip(top_n_branch_preds[0], top_n_branch_probs[0])]
+
+    # Print the predictions for debugging
+    print("College Predictions:", college_predictions)
+    print("Branch Predictions:", branch_predictions)
+
+    return college_predictions, branch_predictions
 
 # Define a route to handle POST requests for submitting form data
 @app.route('/submit-form', methods=['POST'])
